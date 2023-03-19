@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.InterfaceMapper">
+    <delete id="clearInterface">
+        DELETE FROM interface WHERE ID > 0
+    </delete>
+
+    <select id="selectOneByRequest" resultType="com.github.stazxr.zblog.base.domain.entity.Interface">
+        SELECT
+            ID, CODE, URI, METHOD, CREATE_DATE
+        FROM
+            interface
+        WHERE
+            URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
+    </select>
+
+    <select id="selectPermInterfaces" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT CODE, URI, METHOD, TYPE, CREATE_TIME FROM interface
+        <where>
+            <if test="permId != null and permId != ''">
+                AND CODE IN (
+                    SELECT PERM_CODE FROM permission WHERE ID = #{permId}
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectInterfacesByCode" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT CODE, URI, METHOD, TYPE, CREATE_TIME FROM interface WHERE CODE = #{code}
+    </select>
+</mapper>

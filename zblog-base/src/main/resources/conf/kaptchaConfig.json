@@ -1,0 +1,19 @@
+[
+  {
+    "name": "loginCode",
+    "properties": {
+      "captchaType": "Arithmetic",
+      "captchaCode": {
+        "length": 2,
+        "width": 111,
+        "height": 36
+      }
+    }
+  },
+  {
+    "name": "changePwdWhenForget",
+    "properties": {
+      "duration": 180
+    }
+  }
+]

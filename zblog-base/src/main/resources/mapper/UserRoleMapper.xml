@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.UserRoleMapper">
+    <delete id="deleteByRoleId">
+        DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_role_relation WHERE USER_ID = #{userId}
+    </delete>
+
+    <delete id="batchDeleteUserRole">
+        DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId} AND USER_ID IN
+        <choose>
+            <when test="userIds != null and userIds.size() > 0">
+                <foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no delete')
+            </otherwise>
+        </choose>
+    </delete>
+</mapper>

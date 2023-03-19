@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.UserMapper">
+    <resultMap id="userVoMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
+        <result property="id" column="ID" />
+        <result property="username" column="USERNAME" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="email" column="EMAIL" />
+        <result property="loginTime" column="LOGIN_TIME" />
+        <result property="headImgUrl" column="HEAD_IMG_URL" />
+        <result property="gender" column="GENDER" />
+        <result property="email" column="EMAIL" />
+        <result property="enabled" column="ENABLED" />
+        <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" />
+    </resultMap>
+
+    <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
+        <result property="id" column="ID" />
+        <result property="username" column="USERNAME" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="email" column="EMAIL" />
+        <result property="headImgUrl" column="HEAD_IMG_URL" />
+        <result property="gender" column="GENDER" />
+        <result property="signature" column="SIGNATURE" />
+        <result property="website" column="WEBSITE" />
+        <result property="enabled" column="ENABLED" />
+        <result property="locked" column="LOCKED" />
+        <result property="temp" column="TEMP" />
+        <result property="loginTime" column="LOGIN_TIME" />
+        <result property="expiredTime" column="EXPIRED_TIME" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updateUser" column="UPDATE_USER" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <collection property="roleIds" ofType="Long">
+            <result column="ROLE_ID" />
+        </collection>
+        <collection property="roleNames" ofType="String">
+            <result column="ROLE_NAME" />
+        </collection>
+    </resultMap>
+
+    <select id="selectUserRoleIdList" resultType="java.lang.Long">
+        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+    </select>
+
+    <select id="selectUserList" resultMap="userVoMap">
+        SELECT
+            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER, u.ENABLED, u.LOGIN_TIME
+        FROM user u
+        WHERE u.DELETED = '0'
+        <if test="username != null and username != ''">
+            <bind name="usernameBind" value="'%' + username + '%'"/>
+            AND u.USERNAME LIKE #{usernameBind}
+        </if>
+        <if test="nickname != null and nickname != ''">
+            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
+            AND u.NICKNAME LIKE #{nicknameBind}
+        </if>
+        <if test="enabled != null">
+            AND u.ENABLED = #{enabled}
+        </if>
+        ORDER BY u.LOGIN_TIME DESC
+    </select>
+
+    <select id="selectUserDetail" resultMap="userVoDetailMap">
+        SELECT
+            u.ID, u.USERNAME, u.NICKNAME, u.GENDER, u.EMAIL, ur.ROLE_ID, r.ROLE_NAME,
+            u.ENABLED, u.LOCKED, u.TEMP, u.HEAD_IMG_URL, u.SIGNATURE, u.WEBSITE,
+            u.EXPIRED_TIME, u.LOGIN_TIME, u.CREATE_TIME, u.CREATE_USER, u.UPDATE_TIME, u.UPDATE_USER
+        FROM user u
+        LEFT JOIN (
+            SELECT USER_ID, ROLE_ID FROM user_role_relation
+        ) ur ON ur.USER_ID = u.ID
+        LEFT JOIN role r ON r.ID = ur.ROLE_ID
+        WHERE u.ID = #{userId}
+    </select>
+
+    <select id="selectByUsername" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE USERNAME = #{username}
+    </select>
+
+    <select id="selectByEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE EMAIL = #{email} AND DELETED = 0
+    </select>
+
+    <select id="selectByNickname" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE NICKNAME = #{nickname} AND DELETED = 0
+    </select>
+
+    <select id="selectLoginUserByUsernameOrEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT
+            ID, NICKNAME, HEAD_IMG_URL, GENDER, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`, ENABLED, `LOCKED`
+        FROM user
+        WHERE DELETED = 0
+        <if test="isEmail == true">
+            AND EMAIL = #{username}
+        </if>
+        <if test="isEmail == false">
+            AND USERNAME = #{username}
+        </if>
+    </select>
+</mapper>

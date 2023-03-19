@@ -1,0 +1,143 @@
+server:
+  port: 19992
+spring:
+  application:
+    name: zblog
+  profiles:
+    active: ${PROFILES:dev}
+  main:
+    allow-bean-definition-overriding: false
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      username: root
+      password: mysqlPwd
+      initial-size: 5
+      min-idle: 15
+      max-active: 30
+      # 超时时间（以秒数为单位）
+      remove-abandoned-timeout: 180
+      max-wait: 3000
+      # 连接有效性检测时间
+      time-between-eviction-runs-millis: 60000
+      # 连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      # 连接在池中最大生存的时间
+      max-evictable-idle-time-millis: 900000
+      # 指明连接是否被空闲连接回收器（如果有）进行检验. 如果检测失败, 则连接将被从池中去除
+      test-while-idle: true
+      # 指明是否在从池中取出连接前进行检验, 如果检验失败, 则从池中去除连接并尝试取出另一个
+      test-on-borrow: true
+      # 是否在归还到池中前进行检验
+      test-on-return: false
+      # 检测连接是否有效
+      validation-query: select 1
+      # 配置监控统计
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /api/druid/*
+        reset-enable: false
+        # 密码登录
+        # login-username: admin
+        # login-password: druid@123
+        allow:
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 5000
+          merge-sql: true
+        wall:
+          enabled: true
+          config:
+            drop-table-allow: false
+            multi-statement-allow: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    client-type: lettuce
+    password: redisPwd
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+  web:
+    resources:
+      add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+  freemarker:
+    check-template-location: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .ftl
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+      location: /data/upload_tmp
+  mail:
+    host: smtp.qq.com
+    port: 587
+    protocol: smtp
+    username: stazxr@qq.com
+    password: emailPwd
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+mybatis:
+  configuration-properties:
+    close-implicitly: true
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-value: true
+      logic-not-delete-value: false
+jasypt:
+  encryptor:
+    password: jasyptPwd
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
+logging:
+  file:
+    path: /home/${spring.application.name}/logs/services
+jwt:
+  access-token-duration: 1800
+  refresh-token-duration: 43200
+  allowed-renew-token: true
+  refresh-min-duration: 600
+  max-version: 10
+  algorithm: RS256
+  cert-info:
+    alias: zblog
+    key-password: 123456
+    cert-location: zblog.jks
+  claims:
+    issuer: http://localhost:${server.port}
+    audience: all
+    subject: user
+cache:
+  type: memory
+  default-duration: 300
+zblog:
+  deploy-type: single
+  base-package: com.github.stazxr.zblog
+  is-local-ip-parsing: true
+  file-base-url: http://localhost:${server.port}/file/
+  file-upload-path: /home/${spring.application.name}/file/upload/
+  file-domain: /file/**
+  file-upload-type: 1
